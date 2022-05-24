@@ -22,3 +22,5 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/getUsers',[App\Http\Controllers\HomeController::class, 'getUsers'])->middleware(['auth']);
 Route::post('/session/create',[App\Http\Controllers\SessionController::class, 'create'])->middleware(['auth']);
+Route::post('/send/{session}',[App\Http\Controllers\ChatController::class, 'send'])->middleware(['auth']);
+Route::post('/session/{session}/chats',[App\Http\Controllers\ChatController::class, 'chats'])->middleware(['auth']);

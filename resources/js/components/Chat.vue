@@ -36,10 +36,12 @@
                                 aria-labelledby="panelsStayOpen-headingOne">
                                 <!-- v-for="(founder , index) in $store.founders" :key="index"  v-html="founder.profile_pic"-->
                                 <div class="accordion-body">
-                                    <div class="drop-pic1 d-flex" v-for="(founder, index) in founders" :key="index">
-                                        <li>
+                                    <div class="drop-pic1 d-flex mt-3" v-for="(founder, index) in founders"
+                                        :key="index">
+                                        <li class="position-relative">
                                             <a class="dropdown-item" href="#" @click.prevent="openChat(founder)"><span
                                                     v-html="founder.profile_pic"></span> {{ founder.name }}</a>
+                                            <i class="online-class fa fa-circle " v-if="founder.online"></i>
                                         </li>
 
                                     </div>
@@ -51,9 +53,9 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <span v-for="founder in founders" :key="founder.id" v-if="founder.session">
+                    <span v-for="founder in founders" :key="founder.id" >
                         <messages-component :user="user" @close="close(founder)" :founder="founder"
-                            v-if="founder.session.open"></messages-component>
+                            v-if="founder.session && founder.session.open"></messages-component>
 
                     </span>
 
@@ -213,7 +215,7 @@ export default {
                 this.founders.forEach(
                     founder => (founder.session ? (founder.session.open = false) : "")
                 );
-                 founder.session.open = true;
+                founder.session.open = true;
             } else {
                 this.founders.forEach(
                     founder => (founder.session ? (founder.session.open = false) : "")
@@ -237,6 +239,32 @@ export default {
     },
     created() {
         this.getUsers();
+        Echo.channel("Chat").listen("SessionEvent", e => {
+            let founder = this.founders.find(founder => founder.id == e.session_by);
+            founder.session = e.session;
+            // this.listenForEverySession(founder);
+        });
+
+        Echo.join(`Chat`)
+            .here((users) => { 
+                this.founders.forEach(founder => {
+                    users.forEach(user => {
+                        if (user.id == founder.id) {
+                            founder.online = true;
+                        }
+                    });
+                });
+            })
+            .joining(user => {
+                this.founders.forEach(
+                    founder => (user.id == founder.id ? (founder.online = true) : "")
+                );
+            })
+            .leaving(user => {
+                this.founders.forEach(
+                    founder => (user.id == founder.id ? (founder.online = false) : "")
+                );
+            });
     },
 };
 </script>

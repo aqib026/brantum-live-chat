@@ -1,9 +1,9 @@
 <template>
-    <div class="space-a position-relative  p-0" >
+    <div class="space-a position-relative  p-0">
         <div class="nav-space d-flex align-items-center shadow">
             <div class="user-info">
                 <img src="assets/images/chat (2).jpg" class="img-thumbnail" alt="">
-                <strong> <small class="fw-normal">online</small> {{founder.name}}</strong>
+                <strong> <small class="fw-normal">online</small> {{ founder.name }}</strong>
             </div>
             <div class="dropdown ms-auto">
                 <button class="btn dropdown-toggle shadow-none" type="button" @click.prevent="openToggle"
@@ -12,7 +12,7 @@
                 </button>
                 <ul class="dropdown-menu" :class="show == true ? 'show' : ''" aria-labelledby="dropdownMenuButton1">
                     <li><a class="dropdown-item" href="#" @click.prevent="close">close</a></li>
-                 
+
                 </ul>
             </div>
         </div>
@@ -20,7 +20,20 @@
             <div class="msg_card_body" style="height:calc(100vh - 250px)" v-chat-scroll>
 
                 <template v-for="(chat, index) in chats">
-                    <div class="chat-2 d-flex justify-content-end position-relative" :key="index">
+                <!-- <div :class="messageClass(chat.type)"   class="" >
+                    <div>
+                      <p class="m-0">{{ chat.message }}</p>
+                      <small>9h ago</small>
+                    </div>  
+                    <div class="chat-pic position-relative">
+                       <img :src="'../../assets/images/chat (2).jpg'" class="rounded-circle" alt="">
+                        <span class="style-chat position-absolute bottom-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
+                          <span class="visually-hidden">New alerts</span>
+                        </span>
+                    </div>                    
+                  </div> -->
+               
+                    <div :class="messageClass(chat.type)" class="" :key="index">
                         <div>
                             <p class="m-0">{{ chat.message }}</p>
                             <small>9h ago</small>
@@ -43,7 +56,7 @@
                     </div>
                     <div class="footer-2 position-relative">
                         <input class="form-control" @keyup.enter="sendMessage()" type="text"
-                            placeholder="Enter your message here" aria-label="default input example">
+                            placeholder="Enter your message here" aria-label="default input example" v-model="message">
                         <div class="footer-3 ">
                             <i class=" position-absolute fa-solid fa-face-smile"></i>
                         </div>
@@ -99,7 +112,7 @@
 <script>
 
 export default {
-    props: ['user','founder'],
+    props: ['user', 'founder'],
     components: {
     },
     data() {
@@ -110,47 +123,75 @@ export default {
             isTyping: false,
             search: '',
             show: 'false',
-            
+
         }
     },
     methods: {
-        close() {
-            this.$emit('close');
-        },
+
         openToggle(e) {
             this.show = !this.show
         },
-       
-
+        messageClass: function (type) {
+                if(type == 0){
+                    return 'chat-2 d-flex justify-content-end position-relative';
+                }else{
+                    return 'chat-2 d-flex  justify-content-start position-relative';
+                }
+            },
         sendMessage() {
             if (this.message) {
-                let message = this.message;
+                this.pushToChats(this.message);
+                axios
+                    .post(`/send/${this.founder.session.id}`, {
+                        content: this.message,
+                        to_user: this.founder.id
+                    })
+                    .then(res => (this.chats[this.chats.length - 1].id = res.data));
                 this.message = null;
-                this.chats.push({
-                    user: this.user,
-                    message: message,
-                    type: 0,
-                    read_at: null,
-                    sent_at: 'Just Now',
-                });
-
-                // axios.post(`/send/${this.founder.session.id}/message`,{
-                //     content : message,
-                //     to_user : this.founder.id,
-                //     }).then(response => {
-                //         this.chats[this.chats.length - 1].id = response.data;
-                //         this.proccessingZoom = false;
-
-                //     });
-
             }
         },
+        pushToChats(message) {
+            this.chats.push({
+                message: message,
+                type: 0,
+                read_at: null,
+                sent_at: "Just Now"
+            });
+        },
+        close() {
+            this.$emit("close");
+        },
+        clear() {
+            axios
+                .post(`/session/${this.founder.session.id}/clear`)
+                .then(res => (this.chats = []));
+        },
+        // block() {
+        //   this.session.block = true;
+        //   axios
+        //     .post(`/session/${this.friend.session.id}/block`)
+        //     .then(res => (this.session.blocked_by = auth.id));
+        // },
+        // unblock() {
+        //   this.session.block = false;
+        //   axios
+        //     .post(`/session/${this.friend.session.id}/unblock`)
+        //     .then(res => (this.session.blocked_by = null));
+        // },
+        getAllMessages() {
+            axios
+                .post(`/session/${this.founder.session.id}/chats`)
+                .then(res => (this.chats = res.data.data));
+        },
+        read() {
+            axios.post(`/session/${this.founder.session.id}/read`);
+        }
     },
     created() {
-        this.chats.push(
-            { message: 'hello Anil' },
-        )
+        // this.read();
+        this.getAllMessages();
+
     },
-   
+
 };
 </script>
