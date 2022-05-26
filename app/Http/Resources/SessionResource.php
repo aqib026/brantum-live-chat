@@ -18,6 +18,9 @@ class SessionResource extends JsonResource
             'id'=>$this->id,
             'open'=>false,
             'user' => [$this->user1_id,$this->user2_id],
+            'unreadCount' => $this->chats->where('read_at', null)->where('type', 0)->where('user_id', '!=', auth()->id())->count(),
+            'block' => !!$this->block,
+            'blocked_by' => $this->blocked_by
         ];
     }
 }

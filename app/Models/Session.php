@@ -18,4 +18,28 @@ class Session extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function deleteChats()
+    {
+        $this->chats()->where('user_id', auth()->id())->delete();
+    }
+
+    public function deleteMessages()
+    {
+        $this->messages()->delete();
+    }
+
+    public function block()
+    {
+        $this->block = true;
+        $this->blocked_by = auth()->id();
+        $this->save();
+    }
+
+    public function unblock()
+    {
+        $this->block = false;
+        $this->blocked_by = null;
+        $this->save();
+    }
 }

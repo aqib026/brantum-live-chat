@@ -10,21 +10,21 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MsgReadEvent implements ShouldBroadcast
+class BlockEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $chat;
-    private $session_id;
+    public $session_id;
+    public $blocked;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($chat, $session_id)
+    public function __construct($session_id, $blocked)
     {
-        $this->chat = $chat;
         $this->session_id = $session_id;
+        $this->blocked = $blocked;
         $this->dontBroadcastToCurrentUser();
     }
 

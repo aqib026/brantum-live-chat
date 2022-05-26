@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="{{ asset('') }}assets/lib/bootstrap/css/bootstrap.min.css">
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <script>
+        window.auth = {!!auth()->user()!!}
+    </script>
     <link rel="stylesheet" href="{{ asset('') }}assets/css/style.css">
     <title>Chat Dashboard</title>
 </head>

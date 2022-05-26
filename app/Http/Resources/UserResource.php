@@ -28,7 +28,7 @@ class UserResource extends JsonResource
         if($profile_pic != ''){
            return '<img src="/uploads/'.$profile_pic.'" class="rounded-circle user_img" />';
         }else{
-            return '<img src="../../../assets/images/user-img-2.jpg"  class="rounded-circle user_img" />';
+            return '<img src="../../../assets/images/user-img-2.jpg" class="img-thumbnail" />';
         }
     }
     private function session_details($id){
