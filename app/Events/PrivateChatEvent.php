@@ -14,6 +14,7 @@ class PrivateChatEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $content;
+    public $type;
     public $chat;
 
     /**
@@ -21,9 +22,10 @@ class PrivateChatEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct($content, $chat)
+    public function __construct($content,$type, $chat)
     {
         $this->content = $content;
+        $this->type = $type;
         $this->chat = $chat;
         $this->dontBroadcastToCurrentUser();
     }

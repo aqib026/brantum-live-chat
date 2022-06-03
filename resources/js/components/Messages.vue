@@ -6,7 +6,8 @@
                 <div class="user-info">
 
                     <span v-html="founder.profile_pic"></span>
-                    <strong > {{ founder.name }}  <span v-if="isTyping">is Typing . . .</span> <small class="fw-normal text-success"  v-if="founder.online">online</small></strong>
+                    <strong> {{ founder.name }} <span v-if="isTyping">is Typing . . .</span> <small
+                            class="fw-normal text-success" v-if="founder.online">online</small></strong>
                 </div>
                 <div class="dropdown ms-auto">
 
@@ -32,12 +33,15 @@
                         <div class="d-flex me-3 mt-4" :class="messageClass(chat.type)" :key="index">
 
                             <div>
-                                <p class="m-0">{{ chat.message }}</p>
+                                <p v-if="chat.message" class="m-0">{{ chat.message }}</p>
+                                <div v-if="chat.image" class="msg-img">
+                                    <img :src="'/assets/' + chat.image" alt="">
+                                </div>
                                 <span v-if="chat.type == 0" class="d-flex justify-content-end">
 
                                     <span v-if="chat.read_at == null">
                                         <small>{{ chat.send_at }}</small>
-                                        <i class="fa fa-check"></i>
+                                        <i class="fa fa-check tick-size"></i>
 
                                     </span>
                                     <span v-else-if="chat.read_at != null"
@@ -55,9 +59,28 @@
                 </div>
                 <div class="chat-app-form mt-5">
                     <div class="chat-app-input d-flex align-items-center position-relative">
-                        <i class="fa-solid fa-paperclip"></i>
+
+
+                        <!-- <file-upload ref="upload" v-model="files" :post-action="`/send-image/${this.founder.session.id}`" -->
+                        <!-- @input-file="inputFile" > -->
+                        <!-- <i class="fa-solid fa-paperclip"></i> -->
+                        <!-- </file-upload> -->
+                        <!-- <file-upload :post-action="`/send-image/${this.founder.session.id}`" ref='upload'
+                            v-model="files" @input-file="$refs.upload.active = true"
+                            :headers="{ 'X-CSRF-TOKEN': token }" :data="{ to_user: this.founder.id }">
+                            <i class="fa-solid fa-paperclip"></i>
+                        </file-upload> -->
+
+
+                        <div class="form-group ">
+                            <label class="text-uppercase d-flex align-items-center" for="formFile">
+                                <i class="fa-solid fa-paperclip"></i>
+                            </label>
+                            <input type="file" id="formFile" name="file" v-on:change="onImageChange">
+                        </div>
                         <input type="text" class="form-control ms-3 shadow-none position-relative"
-                            placeholder="Type your Message here" @keyup.enter="sendMessage()" v-model="message"  :disabled="session.block" >
+                            placeholder="Type your Message here" @keyup.enter="sendMessage()" v-model="message"
+                            :disabled="session.block">
                         <i class="fa-solid fa-face-smile"></i>
                         <div class="send-btn position-relative">
                             <button type="button" class="btn btn-primary ms-3" @click="sendMessage()">Send</button>
@@ -92,7 +115,10 @@ export default {
             chats: [],
             isTyping: false,
             show: false,
-
+            file: '',
+            token: document.head.querySelector('meta[name="csrf-token"]').content,
+            success: '',
+            image: '',
         }
     },
     computed: {
@@ -100,20 +126,44 @@ export default {
             return this.founder.session;
         },
         can() {
-          return this.session.blocked_by == auth.id;
+            return this.session.blocked_by == auth.id;
         }
     },
-     watch: {
-    message(value) {
-      if (value) {
-        Echo.private(`Chat.${this.founder.session.id}`).whisper("typing", {
-          name: auth.name
-        });
-      }
-    }
-  },
-    methods: {
+    // watch: {
+    //     files: {
+    //         deep: true,
+    //         handler() {
+    //             let success = this.files[0].success;
+    //             if (success) {
+    //                 // this.getAllMessages();
+    //             }
+    //         }
+    //     },
 
+    //     '$refs.upload'(val) {
+    //         console.log(val);
+    //     }
+    // },
+    methods: {
+        onImageChange(e) {
+            this.isFile = true;
+            this.file = e.target.files[0];
+            let existingObj = this;
+            const config = {
+                headers: {
+                    'content-type': 'multipart/form-data'
+                }
+            }
+            let data = new FormData();
+            data.append('file', this.file);
+            data.append('to_user', this.founder.id);
+            axios.post(`/send-image/${this.founder.session.id}`, data, config)
+                .then(res => {
+                    this.pushImage(res.data.file);
+
+                });
+
+        },
         openToggle() {
             this.show = !this.show
         },
@@ -124,7 +174,6 @@ export default {
                 return 'chat-2 position-relative align-items-start';
             }
         },
-
         sendMessage() {
             if (this.message) {
                 this.pushToChats(this.message);
@@ -138,8 +187,17 @@ export default {
             }
         },
         pushToChats(message) {
+
             this.chats.push({
                 message: message,
+                type: 0,
+                read_at: null,
+                sent_at: "Just Now"
+            });
+        },
+        pushImage(message) {
+            this.chats.push({
+                image: message,
                 type: 0,
                 read_at: null,
                 sent_at: "Just Now"
@@ -182,7 +240,14 @@ export default {
             "PrivateChatEvent",
             e => {
                 this.founder.session.open ? this.read() : "";
-                this.chats.push({ message: e.content, type: 1, sent_at: "Just Now" });
+                if (e.type == '0') {
+                    this.chats.push({ image: e.content, type: 1, sent_at: "Just Now" });
+
+                }else if(e.type =='1'){
+                    this.chats.push({ message: e.content, type: 1, sent_at: "Just Now" });
+
+                }
+
             }
         );
 
@@ -193,19 +258,19 @@ export default {
         );
 
         Echo.private(`Chat.${this.founder.session.id}`).listen(
-          "BlockEvent",
-          e => (this.session.block = e.blocked)
+            "BlockEvent",
+            e => (this.session.block = e.blocked)
         );
 
         Echo.private(`Chat.${this.founder.session.id}`).listenForWhisper(
-      "typing",
-      e => {
-        this.isTyping = true;
-        setTimeout(() => {
-          this.isTyping = false;
-        }, 2000);
-      }
-    );
+            "typing",
+            e => {
+                this.isTyping = true;
+                setTimeout(() => {
+                    this.isTyping = false;
+                }, 2000);
+            }
+        );
 
     },
 

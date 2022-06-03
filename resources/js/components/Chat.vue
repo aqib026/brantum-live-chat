@@ -31,7 +31,7 @@
                                     <button class="self-paid accordion-button" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
                                         aria-controls="panelsStayOpen-collapseOne">
-                                        Active Conversations <span>4</span>
+                                        Active Conversations <span></span>
                                     </button>
                                 </h2>
                                 <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show"
@@ -56,6 +56,7 @@
                                                         v-if="founder.session && (founder.session.unreadCount > 0)">{{
                                                                 founder.session.unreadCount
                                                         }}</span>
+                                                 
 
                                                 </a>
                                             </li>

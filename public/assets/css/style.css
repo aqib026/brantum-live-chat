@@ -119,16 +119,16 @@
     color: black;
 }
 
-
-/* .drop-pic1 .message-count {
+.drop-pic1 .message-count {
     text-align: center;
-    font-size: 14px;
-    background-color: #ff5755;
-    border-radius: 49%;
-    padding: 0px 10px;
-    height: 25px;
-    width: 27px;
-} */
+    font-size: 12px;
+    background-color: #3f8755;
+    border-radius: 50%;
+    padding: 1px 3px;
+    height: 22px;
+    width: 22px;
+    color: #FFFFFF;
+}
 
 .chat-low {
     margin-top: 25px;
@@ -690,4 +690,17 @@
     border-radius: 2.25rem;
     max-width: 100%;
     height: auto;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.msg-img img {
+    width: 270px;
+    height: 250px;
+    padding: 0;
+    clip-path: none;
+    border-radius: 10px;
+    border: 4px solid #676099;
 }

@@ -23,6 +23,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/getUsers',[App\Http\Controllers\HomeController::class, 'getUsers'])->middleware(['auth']);
 Route::post('/session/create',[App\Http\Controllers\SessionController::class, 'create'])->middleware(['auth']);
 Route::post('/send/{session}',[App\Http\Controllers\ChatController::class, 'send'])->middleware(['auth']);
+Route::post('/send-image/{session}',[App\Http\Controllers\ChatController::class, 'sendFile'])->middleware(['auth']);
 Route::post('/session/{session}/chats',[App\Http\Controllers\ChatController::class, 'chats'])->middleware(['auth']);
 Route::post('/session/{session}/read',[App\Http\Controllers\ChatController::class, 'read'])->middleware(['auth']);
 Route::post('/session/{session}/clear',[App\Http\Controllers\ChatController::class, 'clear'])->middleware(['auth']);

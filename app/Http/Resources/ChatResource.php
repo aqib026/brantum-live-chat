@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use PDO;
 
 class ChatResource extends JsonResource
 {
@@ -14,10 +15,16 @@ class ChatResource extends JsonResource
      */
     public function toArray($request)
     {
+        $file = false;
+        if ($this->message['image'] != null) {
+            $file = true;
+        }
         return [
             'message' => $this->message['content'],
+            'image' => $this->message['image'],
             'id' => $this->id,
             'type' => $this->type,
+            'isfile' => $file,
             'read_at' => $this->read_at_timing($this),
             'send_at' => $this->created_at->diffForHumans()
         ];
