@@ -10,7 +10,7 @@
                             <img src="assets/images/chat-icon2.png" alt="">
                             <h1>Brantum Live Chat</h1>
                         </div>
-                        <div class="chat-logo">
+                        <!-- <div class="chat-logo">
                             <img src="assets/images/hero.jpg" alt="">
                             <div class="chat-text d-flex">
                                 <p>Bill Bradford</p>
@@ -24,7 +24,7 @@
                                     <label class="form-check-label" for="flexSwitchCheckChecked">Active</label>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="accordion" id="accordionPanelsStayOpenExample">
                             <div class=" chat-low accordion-item">
                                 <h2 class="accordion-header" id="panelsStayOpen-headingOne">
@@ -97,7 +97,7 @@
                         </span>
                     </div>
                     <!-- THIRD COLUMN START -->
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="third-lay">
                             <div class="layout">
 
@@ -196,7 +196,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <!-- THIRD COLUMN END -->
                 </div>
                 <!-- FIRST COLUMN END -->
